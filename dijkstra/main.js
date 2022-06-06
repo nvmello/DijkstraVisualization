@@ -76,7 +76,7 @@ var nodeFolder = gui.addFolder('Nodes');
 
 var nodeArray = []; //array to store the vector3 positions of each node
 
-for( var i = 0; i < 20; i++){ //loop to fill nodeArray
+for( var i = 0; i < 5; i++){ //loop to fill nodeArray
   nodeArray[i] = addNode();
 }
 
@@ -84,32 +84,50 @@ for( var i = 0; i < 20; i++){ //loop to fill nodeArray
  * addEdge()
  * function will create one edge between two nodes each time called
  */
- function addEdge(vecP1, vecP2){
-
-  const material = new THREE.LineBasicMaterial( { color: 0xff00ff, linewidth: 6 } );  //creates line material, linewidth will not work because of opengl
-
-  const points = [];  //create an array of points the edge will travel
-
-  points.push( vecP1 );   //vector of endpoints from nodeA
-  points.push( vecP2 );   //vector of endpoints to nodeB
-
-  const geometry = new THREE.BufferGeometry().setFromPoints( points );  //geometry of a line defined based on the points given
-
-  const line = new THREE.Line( geometry, material );  //creates a line based on the material and geometry defined
-
-  scene.add(line);    //adds each star to the scene once it is created 
-}
-
-
-//Test code to connect each node
-// var j = 1
-// while( j <= 19){
-//   addEdge(nodeArray[j], nodeArray[j-1]);
-//   j+=1;
+//  function addEdge(vecP1, vecP2, color){
+//   const material = new THREE.LineBasicMaterial( { color: color, linewidth: 6 } );  //creates line material, linewidth will not work because of opengl
+//   const points = [];  //create an array of points the edge will travel
+//   points.push( vecP1 );   //vector of endpoints from nodeA
+//   points.push( vecP2 );   //vector of endpoints to nodeB
+//   const geometry = new THREE.BufferGeometry().setFromPoints( points );  //geometry of a line defined based on the points given
+//   const line = new THREE.Line( geometry, material );  //creates a line based on the material and geometry defined
+//   scene.add(line);    //adds each star to the scene once it is created 
 // }
 
 
-addEdge(nodeArray[0], nodeArray[1]);  //code to connect node 1 with node 2
+//******************************PRACTICE ARROW EDGE************************************** */
+function addEdge(vecP1, vecP2, color){
+
+/**
+ * .clone ( recursive : Boolean ) : Object3D
+ *    recursive -- if true, descendants of the object are also cloned. Default is true.
+ *    Returns a clone of this object and optionally all descendants.
+ */
+  var direction = vecP2.clone().sub(vecP1);     //subtracts vecP1 from vecP2
+  var length = direction.length();  //calculates the distance between 2 nodes
+  var arrowHelper = new THREE.ArrowHelper(direction.normalize(), vecP1, length, color );  //creates the arrowHelper
+  scene.add( arrowHelper );   //adds arrowHelper to scene
+}
+//******************************************************************************************** */
+
+
+// Test code to connect each node
+// addEdge(nodeArray[0], nodeArray[1]);
+for(var i = 0; i<nodeArray.length; i++){
+  for(var j = 0; j<nodeArray.length; j++){
+    if(i != j){
+      if(j %2 == 0){
+        addEdge(nodeArray[i], nodeArray[j], 0xff00ff);
+      } else{
+        addEdge(nodeArray[i], nodeArray[j], 0x0000ff);
+      }
+      
+    }
+  }
+}
+
+
+// addEdge(nodeArray[0], nodeArray[1]);  //code to connect node 1 with node 2
 
 
 
