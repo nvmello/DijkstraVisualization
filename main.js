@@ -1,8 +1,8 @@
 import './style.css'
-import * as THREE from 'https://unpkg.com/three@0.138.0/build/three.module.js';
+import * as THREE from './https://unpkg.com/three@0.138.0/build/three.module.js';
 // import { GUI } from 'dat.gui'
-import { OrbitControls } from 'https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js';
-import { CompressedTextureLoader } from 'https://unpkg.com/three@0.138.0/build/three.module.js';
+import { OrbitControls } from './https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js';
+import { CompressedTextureLoader } from './https://unpkg.com/three@0.138.0/build/three.module.js';
 
 
 /**
