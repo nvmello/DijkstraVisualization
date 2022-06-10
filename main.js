@@ -1,8 +1,8 @@
 import './style.css'
-import * as THREE from 'node_modules/three';
+import * as THREE from './node_modules/three';
 // import { GUI } from 'dat.gui'
-import { OrbitControls } from 'node_modules/three/examples/jsm/controls/OrbitControls';
-import { CompressedTextureLoader } from 'node_modules/three';
+import { OrbitControls } from './node_modules/three/examples/jsm/controls/OrbitControls';
+import { CompressedTextureLoader } from './node_modules/three';
 
 
 /**
