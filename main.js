@@ -1,4 +1,4 @@
-import './style.css'
+// import './style.css'
 import * as THREE from '../node_modules/three/build/three.module.js';
 // import { GUI } from 'dat.gui'
 import { OrbitControls } from '../node_modules/three/examples/jsm/controls/OrbitControls.js';
