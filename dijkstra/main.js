@@ -60,8 +60,8 @@ const NUM_NODES = 5;    //NUMBER OF NODES IN THR GRAPH
 const MAX_EDGES_PER_NODE = 3;
 
 //MAY END UP NOT USING GUI FOLDERS
-// const gui = new GUI()     //create a new gui element
-// var nodeFolder = gui.addFolder('Nodes'); 
+const gui = new GUI()     //create a new gui element
+var nodeFolder = gui.addFolder('Nodes'); 
 
 
 /**
@@ -84,7 +84,7 @@ class Node {
     // console.log(nodeName);  //test code for the console
 
      //MAY NOT END UP USING THE FOLDERS
-    // nodeFolder = gui.addFolder(nodeName);   //adds folders to the gui window
+    this.nodeFolder = gui.addFolder(nodeName);   //adds folders to the gui window
     //I am hoping to be able to use this part of the code to allow the user to determine the weights of edges
       //may have to move this to the addEdge() function
     // nodeFolder.add(node.rotation, 'x', 0, 10); //adds a node folder for each node created, 
@@ -101,9 +101,9 @@ var nodeArray = []; //array to store the vector3 positions of each node
  * addNode()
  * function will create a node every time called
  */
-function addNode(){
+function addNode(numNodes){
   var color = YELLOW;
-  for( var i = 0; i < NUM_NODES; i++){ //loop to fill nodeArray
+  for( var i = 0; i < numNodes; i++){ //loop to fill nodeArray
     var nodeNum = (i+1);  // gives the node a unique number
     var nodeName = "Node " + nodeNum ;//Names each node for the gui
     
@@ -117,17 +117,7 @@ function addNode(){
   }
 }
 
-//call addNode() function
-addNode();
 
-
-//****************************** Adjacency List ************************************** */
-/**
- * This creates an array for each node in the list
- * length+1 so each nodeNum can be a key, 
- * adjList[0] will be sert to null
- */
-let adjList = new Array(nodeArray.length+1);
 
 /**
  * initAdjacencyList initializes the adjacency list
@@ -147,10 +137,9 @@ function initAdjacencyList(){
   }
 }
 
-//call to initialize the adjacency list
-initAdjacencyList();
 
 
+/************************************************************************************************/
 
 /**
  * Function that adds an edge between two nodes to the scene
@@ -171,10 +160,14 @@ class Edge{
    *    Returns a clone of this object and optionally all descendants.
    */
     var direction = (endNode.coord).clone().sub(startNode.coord);     //calculates the direction between the two nodes
-    var length = direction.length();  //calculates the distance between 2 nodes
-    var edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color );  //creates the edge using arrowHelper
 
-    this.weight = length;   //weight to be used in dijkstras
+    this.length =  length = direction.length();  //calculates the distance between 2 nodes
+
+    // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
+    var edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper
+
+   
+    this.distance = Infinity;   //Distance to be used in dijkstras
     
     if(!adjList[startNode.nodeNum].includes(endNode) && startNode.nodeNum != endNode.nodeNum){
       // console.log("node: " + startNode.nodeNum + " --------> " + "node: " + endNode.nodeNum);
@@ -189,6 +182,7 @@ class Edge{
   }
 }
 
+/************************************************************************************************/
 /**
  * Class that packages a node and edge together to store in the adjacency list
  *    this allows 
@@ -200,10 +194,7 @@ class NodeEdgePair{
   }
 }
 
-
-
-//******************************************************************************************** */
-
+/************************************************************************************************/
 
 /**
  * This function creates the edges of the graph
@@ -243,12 +234,7 @@ function generateEdges(){
   }
 }
 
-// Call to generateEdges
-generateEdges();
-const testEdge = new Edge(nodeArray[0], nodeArray[2], BLUE);
 
-//NEED TO FIGURE OUT HOW TO UPDATE THE COLOR OF OBJECTS IN SCENE DYNAMICALLY
-// testEdge.edge.material.color.setHex(RED);
 
 /**
  * consoleConnectionsLog is a function that prints all the nodes and their connections to the console
@@ -264,15 +250,55 @@ function consoleConnectionsLog(){
 }
 
 
+
+/************************************************************************************************/
+
+//This will create a specified number of unique nodes in the scene
+addNode(NUM_NODES);
+
+
+//****************************** Adjacency List ************************************** */
+/**
+ * This creates an array for each node in the list
+ * length+1 so each nodeNum can be a key, 
+ * adjList[0] will be sert to null
+ */
+let adjList = new Array(nodeArray.length+1);
+
+/************************************************************************************************/
+
+//call to initialize the adjacency list with the nodes and edges from the graph
+initAdjacencyList();
+
+/************************************************************************************************/
+
+// Call to generateEdges
+generateEdges();
+var testEdge = new Edge(nodeArray[0], nodeArray[2], BLUE);
+testEdge = new Edge(nodeArray[0], nodeArray[2], WHITE);
+
+// const testEdge2 = new Edge(nodeArray[0], nodeArray[2], WHITE);
+
+/************************************************************************************************/
+
 //Call to print all of the connections to the console
 consoleConnectionsLog();
 
+/**
+ * dijkstra_spt, shortest path algorithm given a start and end node
+ * @param {*} startNode pass in a start node to calculate dijkstra spt on
+ * @param {*} endNode   pass in an end node that the algorithm will terminate on once reached
+ */
+function dijkstra_spt(startNode, endNode){
+  let dist = [NUM_NODES];       //keeps track of total distance required to travel to reach each node
+  let visited = [NUM_NODES];    //keeps track of if the node was visited
+  for(let i = 0; i < NUM_NODES  ; i++){
+    dist[i] = Infinity;         //initialize all nodes distance to infinity 
+  }
+  dist[startNode] = 0;                  //initialize the chosen start node distance to zero
 
 
-console.log("     ");
-console.log("     ");
-
-
+}
 
 
 //***************************** Render Loop ************************************************ */
