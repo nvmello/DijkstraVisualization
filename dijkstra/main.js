@@ -56,7 +56,7 @@ const controls = new OrbitControls(camera, renderer.domElement);    //allows the
 //***************************************************************************** */
 
 
-const NUM_NODES = 5;    //NUMBER OF NODES IN THR GRAPH
+const NUM_NODES = 3;    //NUMBER OF NODES IN THR GRAPH
 const MAX_EDGES_PER_NODE = 3;
 
 //MAY END UP NOT USING GUI FOLDERS
@@ -76,8 +76,10 @@ class Node {
     this.y = THREE.MathUtils.randFloatSpread(GRID_SIZE/2) ;  //randomly generates a unique x,y,z value for each star
     this.z = THREE.MathUtils.randFloatSpread(GRID_SIZE/2) ;  //randomly generates a unique x,y,z value for each star
     // console.log(this.x);
+
     this.visited = 0;   //this variable will be used in dijkstras to tell if the nod has been visited yet
     this.distance = Infinity;     //property of dijkstras, begin will all nodes distance being set to infinity
+
     this.coord = new THREE.Vector3(this.x, this.y, this.z);
     this.nodeNum = nodeNum;
     this.nodeName = nodeName;
@@ -127,7 +129,7 @@ function addNode(numNodes){
  */
 function initAdjacencyList(){                                                  
   for (var i = 0; i < adjList.length; i++) {
-    if(i == 0){         // adjList[0] will be null
+    if(i === 0){         // adjList[0] will be null
       adjList[i] = new Array();
       adjList[i].push(null);
     }
@@ -161,8 +163,9 @@ class Edge{
    */
     var direction = (endNode.coord).clone().sub(startNode.coord);     //calculates the direction between the two nodes
 
-    this.length =  length = direction.length();  //calculates the distance between 2 nodes
-
+    var length = direction.length();  //calculates the distance between 2 nodes
+    this.weight = length;
+  
     // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
     var edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper
 
@@ -274,8 +277,8 @@ initAdjacencyList();
 
 // Call to generateEdges
 generateEdges();
-var testEdge = new Edge(nodeArray[0], nodeArray[2], BLUE);
-testEdge = new Edge(nodeArray[0], nodeArray[2], WHITE);
+// var testEdge = new Edge(nodeArray[0], nodeArray[2], BLUE);
+// testEdge = new Edge(nodeArray[0], nodeArray[2], WHITE);
 
 // const testEdge2 = new Edge(nodeArray[0], nodeArray[2], WHITE);
 
@@ -284,21 +287,149 @@ testEdge = new Edge(nodeArray[0], nodeArray[2], WHITE);
 //Call to print all of the connections to the console
 consoleConnectionsLog();
 
+
+/**
+ * Class that will maintain a min heap structure to keep track of shortest paths
+ */
+class MinHeap{
+
+  /**
+   * initializes a new heap, an array with positioin [0] set as null
+   */
+  constructor () {
+
+    this.heap = [null];
+
+  }
+
+  /**
+   * returns smallest item in the heap
+   * @returns the heapNode located at position [1] in the heap, this should always be the smallest item
+   */
+  getMin() {
+      return this.heap[1]
+  }
+
+  /**
+   * inserts a new item into the heap, should maintain the min heap property of every parent being smaller than their children
+   * @param {*} heapNode 
+   */
+  insert(heapNode){
+
+    this.heap.push(heapNode);   //inserts a node at the end of the heap;
+
+    if (this.heap.length > 1) {   //if the length of the heap is greater than 1
+      
+      let currentNodePos = (this.heap.length - 1);
+      
+      //while the heapNodes distance is less than its parent node, move up
+      while(currentNodePos > 1 && this.heap[Math.floor(currentNodePos/2)].distance > this.heap[currentNodePos].distance ){
+
+        /* Swapping the two nodes by using the ES6 destructuring syntax*/
+        [this.heap[Math.floor(currentNodePos/2)], this.heap[currentNodePos]] = [this.heap[currentNodePos], this.heap[Math.floor(currentNodePos/2)]];
+
+        currentNodePos = Math.floor(currentNodePos/2);    //resets current to the new position
+
+      }
+    }
+  }
+
+
+  /**
+   * Prints all items in the heap array
+   */
+  printHeap() {
+		for (let i = 1; i < this.heap.length; i++) {
+      console.log("Heap " + this.heap[i].nodeName + "  -->  Node Distance " + this.heap[i].distance);
+		}
+	}
+
+  remove(){
+
+    let smallest = this.heap[1];
+
+    //When there are more than 2 elements in the array, the rightmost element takes the first elements place
+
+    if(this.heap.length > 2){
+      this.heap[1] = this.heap[this.heap.length-1];
+      this.heap.splice(this.heap.length-1);
+      console.log("this.heap.length: " + this.heap.length)
+
+      if(this.heap.length === 3){   //if there are only 2 items in the min heap  (length 3 because of the [0] null position)
+
+        if(this.heap[1].distance > this.heap[2].distance){    //if the parent is larger than the child
+
+          [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]]; //Swap the larger parent with the only child
+
+        }
+
+        return smallest;
+
+      }
+    }
+
+  }
+}
+
+
 /**
  * dijkstra_spt, shortest path algorithm given a start and end node
  * @param {*} startNode pass in a start node to calculate dijkstra spt on
  * @param {*} endNode   pass in an end node that the algorithm will terminate on once reached
  */
-function dijkstra_spt(startNode, endNode){
-  let dist = [NUM_NODES];       //keeps track of total distance required to travel to reach each node
-  let visited = [NUM_NODES];    //keeps track of if the node was visited
-  for(let i = 0; i < NUM_NODES  ; i++){
-    dist[i] = Infinity;         //initialize all nodes distance to infinity 
+ function dijkstra_spt(startNodeNum, endNodeNum){
+  
+  // initilaize_single_source
+  
+  // nodeArray.forEach(element => {     //not neaded because all new nodes are initialized with a distance of Infinity
+  //   element.distance = Infinity;
+  // });
+ 
+  nodeArray[startNodeNum-1].distance = 0;   //initializes the startNode distance to zero
+  nodeArray[startNodeNum-1].visited = 1;    //initializes the startNode visited to 1
+
+  nodeArray[1].distance = 23;   //Test
+  nodeArray[2].distance = 69;   //Test
+  
+  // maintain a set finalSet of vertices whose final shortest-path weights from the source startNodeNum have already been determined.
+  let finalSet = []
+
+  // initialize min-priority queue Q of vertices, keyed by their d values.
+  var minHeap = new MinHeap();
+
+  //insert all nodes in the graph into the min heap
+  for(let i = 0; i < nodeArray.length; i++){
+    minHeap.insert(nodeArray[i]);
   }
-  dist[startNode] = 0;                  //initialize the chosen start node distance to zero
+
+  // while Q != null
+          // u = extract_min
+          // S = S U {u} 
+          // for each vertex v in adj[u] 
+                // relax(u,v,w)
 
 
+  //************* MinHeap Test Output **************/
+  minHeap.printHeap();
+  console.log("\n")
+  minHeap.remove();
+
+  minHeap.printHeap();
+
+  let testNode = new Node(444, 'testNode', YELLOW);
+  testNode.distance = 2;
+
+  console.log("\n")
+  console.log("insert test node")
+  minHeap.insert(testNode)
+
+  minHeap.printHeap();
+  //****************************************/
+  
 }
+
+dijkstra_spt(1, 2)
+
 
 
 //***************************** Render Loop ************************************************ */
