@@ -339,35 +339,79 @@ class MinHeap{
    * Prints all items in the heap array
    */
   printHeap() {
-		for (let i = 1; i < this.heap.length; i++) {
-      console.log("Heap " + this.heap[i].nodeName + "  -->  Node Distance " + this.heap[i].distance);
-		}
+    if(this.heap.length == 1){
+      console.log("Empty Heap");
+    } 
+    else{
+      for (let i = 1; i < this.heap.length; i++) {
+        console.log("Heap " + this.heap[i].nodeName + "  -->  Node Distance " + this.heap[i].distance);
+        }
+    }
 	}
 
   remove(){
 
-    let smallest = this.heap[1];
+    let smallest = this.heap[1];      //save the smallest value
 
     //When there are more than 2 elements in the array, the rightmost element takes the first elements place
 
     if(this.heap.length > 2){
-      this.heap[1] = this.heap[this.heap.length-1];
-      this.heap.splice(this.heap.length-1);
-      console.log("this.heap.length: " + this.heap.length)
 
-      if(this.heap.length === 3){   //if there are only 2 items in the min heap  (length 3 because of the [0] null position)
+      this.heap[1] = this.heap[this.heap.length-1];   //rightmost item in heap replaces the root
+
+      this.heap.splice(this.heap.length-1);   //remove the last position in the heap completely
+
+      //if there are only 2 items in the min heap  (length 3 because of the [0] null position)
+      if(this.heap.length === 3){   
 
         if(this.heap[1].distance > this.heap[2].distance){    //if the parent is larger than the child
 
           [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]]; //Swap the larger parent with the only child
 
         }
-
         return smallest;
+      }
+    
 
+    //Current Node and child node positions:
+    let currentPos = 1;
+    let leftChild = 2 * currentPos;
+    let rightChild = 2 * currentPos + 1;
+
+    //while there are still left and right child nodes
+    // AND the current nodes distance is more than one of the childrens distance
+    //swap the current node with the smaller of the child nodes
+    while (this.heap[leftChild] &&
+            this.heap[rightChild] &&
+            (this.heap[currentPos].distance > this.heap[leftChild].distance ||
+            this.heap[currentPos].distance > this.heap[rightChild].distance)){
+
+        if(this.heap[rightChild].distance < this.heap[leftChild].distance){ // if the right child is smaller
+          //swap with the right
+          [this.heap[currentPos], this.heap[rightChild]] = [this.heap[rightChild], this.heap[currentPos]];
+          currentPos = leftChild;
+        } 
+        else{ // if the left child is smaller
+          //swap with the left
+          [this.heap[currentPos], this.heap[leftChild]] = [this.heap[leftChild], this.heap[currentPos]];
+          currentPos = rightChild;
+        }
+
+        //update left and right child positions
+        leftChild = 2 * currentPos;
+        rightChild = 2 * currentPos + 1;
       }
     }
 
+    //if there is only 1 item left in the heap
+    else if( this.heap.length === 2){
+      this.heap.splice(1,1);    //remove it from the heap
+    } 
+    else{
+      return null;    //return null if attempted to remove a node when there are none in the heap
+    }
+
+    return smallest;  // return the smallest node that was removed from the heap
   }
 }
 
@@ -412,7 +456,7 @@ class MinHeap{
   //************* MinHeap Test Output **************/
   minHeap.printHeap();
   console.log("\n")
-  minHeap.remove();
+  
 
   minHeap.printHeap();
 
@@ -420,10 +464,53 @@ class MinHeap{
   testNode.distance = 2;
 
   console.log("\n")
-  console.log("insert test node")
+  console.log("insert test node weight 2")
   minHeap.insert(testNode)
 
   minHeap.printHeap();
+
+  let testNode2 = new Node(33, 'testNode2', YELLOW);
+  testNode2.distance = 5;
+
+  console.log("\n")
+  console.log("insert test node weight 5")
+  minHeap.insert(testNode2)
+
+  minHeap.printHeap();
+
+
+  console.log("\n")
+  console.log("remove()")
+  minHeap.remove();
+
+  minHeap.printHeap();
+
+  console.log("\n")
+  console.log("remove()")
+  minHeap.remove();
+
+  minHeap.printHeap();
+
+  console.log("\n")
+  console.log("remove()")
+  minHeap.remove();
+
+  minHeap.printHeap();
+
+  console.log("\n")
+  console.log("remove()")
+  minHeap.remove();
+
+  minHeap.printHeap();
+
+  console.log("\n")
+  console.log("remove()")
+  minHeap.remove();
+
+  minHeap.printHeap();
+
+
+
   //****************************************/
   
 }
@@ -441,3 +528,6 @@ function animate(){
 }
 
 animate();      //call our recursive animate function
+
+
+
