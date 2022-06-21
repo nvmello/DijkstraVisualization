@@ -56,12 +56,12 @@ const controls = new OrbitControls(camera, renderer.domElement);    //allows the
 //***************************************************************************** */
 
 
-const NUM_NODES = 3;    //NUMBER OF NODES IN THR GRAPH
+const NUM_NODES = 5;    //NUMBER OF NODES IN THR GRAPH
 const MAX_EDGES_PER_NODE = 3;
 
 //MAY END UP NOT USING GUI FOLDERS
-const gui = new GUI()     //create a new gui element
-var nodeFolder = gui.addFolder('Nodes'); 
+// const gui = new GUI()     //create a new gui element
+// var nodeFolder = gui.addFolder('Nodes'); 
 
 
 /**
@@ -69,6 +69,21 @@ var nodeFolder = gui.addFolder('Nodes');
  */
 class Node {
   constructor(nodeNum, nodeName, color) {
+    if(nodeNum === 1){
+      color = WHITE
+    }
+    if(nodeNum === 2){
+      color = RED
+    }
+    if(nodeNum === 3){
+      color = GREEN
+    }
+    if(nodeNum === 4){
+      color = YELLOW
+    }
+    if(nodeNum === 5){
+      color = BLUE
+    }
     const geometry = new THREE.SphereGeometry(2,24,24);      //creates a sphere geometry
     const material = new THREE.MeshStandardMaterial({color: color}); //sets the sphere material
     const node = new THREE.Mesh(geometry, material);    //creates a new 'node' onject with both the geometry and material specified
@@ -86,7 +101,8 @@ class Node {
     // console.log(nodeName);  //test code for the console
 
      //MAY NOT END UP USING THE FOLDERS
-    this.nodeFolder = gui.addFolder(nodeName);   //adds folders to the gui window
+    // this.nodeFolder = gui.addFolder(nodeName);   //adds folders to the gui window
+
     //I am hoping to be able to use this part of the code to allow the user to determine the weights of edges
       //may have to move this to the addEdge() function
     // nodeFolder.add(node.rotation, 'x', 0, 10); //adds a node folder for each node created, 
@@ -104,13 +120,14 @@ var nodeArray = []; //array to store the vector3 positions of each node
  * function will create a node every time called
  */
 function addNode(numNodes){
-  var color = YELLOW;
+  var color = BLUE;
   for( var i = 0; i < numNodes; i++){ //loop to fill nodeArray
     var nodeNum = (i+1);  // gives the node a unique number
     var nodeName = "Node " + nodeNum ;//Names each node for the gui
     
     
     // console.log("NODENAME: " + nodeName);
+    
     const myNode = new Node(nodeNum, nodeName, color);
     // console.log("myNode.x");
     // console.log(myNode.x);
@@ -167,18 +184,18 @@ class Edge{
     this.weight = length;
   
     // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
-    var edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper
+    const edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper
 
    
-    this.distance = Infinity;   //Distance to be used in dijkstras
+   
     
     if(!adjList[startNode.nodeNum].includes(endNode) && startNode.nodeNum != endNode.nodeNum){
       // console.log("node: " + startNode.nodeNum + " --------> " + "node: " + endNode.nodeNum);
       
-      const newPair = new NodeEdgePair(endNode, edge);    //pair that contains the destination node and the edge that points to it
+      // const newPair = new NodeEdgePair(endNode, edge);    //pair that contains the destination node and the edge that points to it
 
-      adjList[startNode.nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
-                                                  // this should make the code more lightweight when running dijstras 
+      // adjList[startNode.nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
+      //                                             // this should make the code more lightweight when running dijstras 
 
       scene.add( edge );   //adds arrowHelper to scene
     }
@@ -210,19 +227,26 @@ class NodeEdgePair{
 function generateEdges(){
   var color = GREEN
   const newEdge = new Edge(nodeArray[nodeArray.length-1], nodeArray[0], color);
+  var newPair = new NodeEdgePair(nodeArray[0], newEdge);    //pair that contains the destination node and the edge that points to it
+  adjList[nodeArray[nodeArray.length-1].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
+
+                                                  // this should make the code more lightweight when running dijstras 
   // addEdge(nodeArray[nodeArray.length-1], nodeArray[0], color);   //this connects node[n] to node[0] creating a loop
                                                             // assuring every node is reachable via any other node
   //loop to connect the rest of the nodes                                                          
   for(var i = 0; i < nodeArray.length-1; i++){
-    color = PINK;
     // console.log("i = " + i);
     const newEdge2 = new Edge(nodeArray[i], nodeArray[i+1], color);
+    newPair = new NodeEdgePair(nodeArray[i+1], newEdge2);    //pair that contains the destination node and the edge that points to it
+          adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
       // addEdge(nodeArray[i], nodeArray[i+1], color);  //this connects node[0] to node[1] to node[2].... to node[n-1]
         for(var j = 0; j < Math.floor(Math.random()*MAX_EDGES_PER_NODE); j++){ //this loop creats a random number of connections for each node
           color = GREEN;
           var randNode = nodeArray[Math.floor(Math.random()*nodeArray.length)];    //select a random node for the created edge to travel to
         
           const newEdge3 = new Edge(nodeArray[i], randNode, color);
+          newPair = new NodeEdgePair(randNode, newEdge3);    //pair that contains the destination node and the edge that points to it
+          adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
             // addEdge(nodeArray[i], randNode, color);    //add the randomly created edge to the scene
 
         }
@@ -247,7 +271,7 @@ function consoleConnectionsLog(){
   for(let i = 1; i < adjList.length; i++){
     console.log("Node " + i +  ":");
     for(let j = 0; j < adjList[i].length; j++){
-      console.log("      connects to  " + adjList[i][j].node.nodeName);
+      console.log("      connects to  " + adjList[i][j].node.nodeName + " with length " + adjList[i][j].edge.weight);
     }
   }
 }
@@ -353,6 +377,8 @@ class MinHeap{
 
     let smallest = this.heap[1];      //save the smallest value
 
+    // console.log("smallest: " + smallest.distance);
+
     //When there are more than 2 elements in the array, the rightmost element takes the first elements place
 
     if(this.heap.length > 2){
@@ -431,9 +457,6 @@ class MinHeap{
  
   nodeArray[startNodeNum-1].distance = 0;   //initializes the startNode distance to zero
   nodeArray[startNodeNum-1].visited = 1;    //initializes the startNode visited to 1
-
-  nodeArray[1].distance = 23;   //Test
-  nodeArray[2].distance = 69;   //Test
   
   // maintain a set finalSet of vertices whose final shortest-path weights from the source startNodeNum have already been determined.
   let finalSet = []
@@ -445,77 +468,51 @@ class MinHeap{
   for(let i = 0; i < nodeArray.length; i++){
     minHeap.insert(nodeArray[i]);
   }
+  // console.log("minheap len: " + minHeap.heap.length)
+    // while Q != null
+  while(minHeap.heap.length > 1){
+    // u = extract_min
+    let u = minHeap.remove();
+    // S = S U {u} 
+    finalSet.push(u);
 
-  // while Q != null
-          // u = extract_min
-          // S = S U {u} 
-          // for each vertex v in adj[u] 
-                // relax(u,v,w)
+    // console.log("u distance: " + u.distance);
+
+    // for each vertex v in adj[u] 
+    for(let i = 0; i < adjList[u.nodeNum].length; i++){
+      
+      console.log(adjList[u.nodeNum][i].node.distance + "   :   " + (u.distance + adjList[u.nodeNum][i].edge.weight));
+
+      if(adjList[u.nodeNum][i].node.distance > (u.distance + adjList[u.nodeNum][i].edge.weight)){
+        adjList[u.nodeNum][i].node.distance = u.distance + adjList[u.nodeNum][i].edge.weight;
+        adjList[u.nodeNum][i].edge.color = WHITE;
+      }
+      
+      // relax(u,v,w)
+     
+    }
+    
+    
+
+          
+  }
+  console.log(adjList[1][0].node.distance)
+  console.log(adjList[1][1].node.distance)
+  console.log("Distance from Node " + startNodeNum + ": ")
+  for(let i = 0; i < finalSet.length;i++){
+    console.log("Node " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
+}
 
 
   //************* MinHeap Test Output **************/
-  minHeap.printHeap();
-  console.log("\n")
+  // minHeap.printHeap();
   
-
-  minHeap.printHeap();
-
-  let testNode = new Node(444, 'testNode', YELLOW);
-  testNode.distance = 2;
-
-  console.log("\n")
-  console.log("insert test node weight 2")
-  minHeap.insert(testNode)
-
-  minHeap.printHeap();
-
-  let testNode2 = new Node(33, 'testNode2', YELLOW);
-  testNode2.distance = 5;
-
-  console.log("\n")
-  console.log("insert test node weight 5")
-  minHeap.insert(testNode2)
-
-  minHeap.printHeap();
-
-
-  console.log("\n")
-  console.log("remove()")
-  minHeap.remove();
-
-  minHeap.printHeap();
-
-  console.log("\n")
-  console.log("remove()")
-  minHeap.remove();
-
-  minHeap.printHeap();
-
-  console.log("\n")
-  console.log("remove()")
-  minHeap.remove();
-
-  minHeap.printHeap();
-
-  console.log("\n")
-  console.log("remove()")
-  minHeap.remove();
-
-  minHeap.printHeap();
-
-  console.log("\n")
-  console.log("remove()")
-  minHeap.remove();
-
-  minHeap.printHeap();
-
-
-
   //****************************************/
   
 }
 
 dijkstra_spt(1, 2)
+
 
 
 
@@ -529,5 +526,10 @@ function animate(){
 
 animate();      //call our recursive animate function
 
+
+
+
+// var updatedEdge = new Edge(adjList[1][1].node, nodeArray[0], WHITE);
+//   console.log("weight: " + updatedEdge.weight);
 
 
