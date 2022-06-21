@@ -57,7 +57,7 @@ const controls = new OrbitControls(camera, renderer.domElement);    //allows the
 
 
 const NUM_NODES = 5;    //NUMBER OF NODES IN THR GRAPH
-const MAX_EDGES_PER_NODE = 3;
+const MAX_EDGES_PER_NODE = 5;
 
 //MAY END UP NOT USING GUI FOLDERS
 // const gui = new GUI()     //create a new gui element
@@ -479,26 +479,23 @@ class MinHeap{
     // console.log("u distance: " + u.distance);
 
     // for each vertex v in adj[u] 
+    // relax(u,v,w)
     for(let i = 0; i < adjList[u.nodeNum].length; i++){
-      
-      console.log(adjList[u.nodeNum][i].node.distance + "   :   " + (u.distance + adjList[u.nodeNum][i].edge.weight));
-
       if(adjList[u.nodeNum][i].node.distance > (u.distance + adjList[u.nodeNum][i].edge.weight)){
         adjList[u.nodeNum][i].node.distance = u.distance + adjList[u.nodeNum][i].edge.weight;
-        adjList[u.nodeNum][i].edge.color = WHITE;
       }
-      
-      // relax(u,v,w)
-     
     }
-    
-    
-
           
   }
-  console.log(adjList[1][0].node.distance)
-  console.log(adjList[1][1].node.distance)
-  console.log("Distance from Node " + startNodeNum + ": ")
+
+  //Loop to cover base case for coloring shortest path, if the end node is directly connected to the source node
+  for(let i = 0; i < adjList[startNodeNum].length; i++){
+  if(endNodeNum === adjList[startNodeNum][i].node.nodeNum){
+    var colorEdge = new Edge(nodeArray[startNodeNum-1], nodeArray[endNodeNum-1], WHITE);
+  }
+}
+
+  console.log("\nDistance from Node " + startNodeNum + " to: ")
   for(let i = 0; i < finalSet.length;i++){
     console.log("Node " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
 }
@@ -511,7 +508,7 @@ class MinHeap{
   
 }
 
-dijkstra_spt(1, 2)
+dijkstra_spt(4, 3)
 
 
 
