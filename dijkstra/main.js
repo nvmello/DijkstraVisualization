@@ -199,7 +199,9 @@ class Edge{
 
       scene.add( edge );   //adds arrowHelper to scene
     }
+    return this.edge;
   }
+  
 }
 
 /************************************************************************************************/
@@ -228,8 +230,10 @@ function generateEdges(){
   var color = GREEN
   const newEdge = new Edge(nodeArray[nodeArray.length-1], nodeArray[0], color);
   var newPair = new NodeEdgePair(nodeArray[0], newEdge);    //pair that contains the destination node and the edge that points to it
-  adjList[nodeArray[nodeArray.length-1].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
 
+  // if(!adjList[nodeArray[nodeArray.length-1].nodeNum].includes(nodeArray[0]) && nodeArray[nodeArray.length-1].nodeNum != nodeArray[0].nodeNum){
+    adjList[nodeArray[nodeArray.length-1].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
+  // }
                                                   // this should make the code more lightweight when running dijstras 
   // addEdge(nodeArray[nodeArray.length-1], nodeArray[0], color);   //this connects node[n] to node[0] creating a loop
                                                             // assuring every node is reachable via any other node
@@ -238,16 +242,34 @@ function generateEdges(){
     // console.log("i = " + i);
     const newEdge2 = new Edge(nodeArray[i], nodeArray[i+1], color);
     newPair = new NodeEdgePair(nodeArray[i+1], newEdge2);    //pair that contains the destination node and the edge that points to it
-          adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
+
+    // if(!adjList[nodeArray[i].nodeNum].includes(nodeArray[i+1]) && nodeArray[i].nodeNum != nodeArray[i+1].nodeNum){
+          adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair,         
+    // }
       // addEdge(nodeArray[i], nodeArray[i+1], color);  //this connects node[0] to node[1] to node[2].... to node[n-1]
+
+
         for(var j = 0; j < Math.floor(Math.random()*MAX_EDGES_PER_NODE); j++){ //this loop creats a random number of connections for each node
+          var flag = true;    //flag to control if a node edge is added to the adjacency list
           color = GREEN;
           var randNode = nodeArray[Math.floor(Math.random()*nodeArray.length)];    //select a random node for the created edge to travel to
-        
+
+          //Loop to keep track of if a node is already connected to the randomly selected node, if it is, 
+          //  dont add it to the adjacency list again
+          for(let k = 0; k < adjList[nodeArray[i].nodeNum].length;k++){
+            if(adjList[nodeArray[i].nodeNum][k].node.nodeNum == randNode.nodeNum){
+              flag = false;     //deny node from being added
+              break;
+            }
+          }
+          
           const newEdge3 = new Edge(nodeArray[i], randNode, color);
           newPair = new NodeEdgePair(randNode, newEdge3);    //pair that contains the destination node and the edge that points to it
-          adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
-            // addEdge(nodeArray[i], randNode, color);    //add the randomly created edge to the scene
+
+
+          if(flag && nodeArray[i].nodeNum != randNode.nodeNum){
+            adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair,   
+          }
 
         }
   }
@@ -391,10 +413,9 @@ class MinHeap{
       if(this.heap.length === 3){   
 
         if(this.heap[1].distance > this.heap[2].distance){    //if the parent is larger than the child
-
           [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]]; //Swap the larger parent with the only child
-
         }
+        
         return smallest;
       }
     
@@ -436,7 +457,6 @@ class MinHeap{
     else{
       return null;    //return null if attempted to remove a node when there are none in the heap
     }
-
     return smallest;  // return the smallest node that was removed from the heap
   }
 }
@@ -473,10 +493,11 @@ class MinHeap{
   while(minHeap.heap.length > 1){
     // u = extract_min
     let u = minHeap.remove();
+
     // S = S U {u} 
     finalSet.push(u);
 
-    // console.log("u distance: " + u.distance);
+    
 
     // for each vertex v in adj[u] 
     // relax(u,v,w)
