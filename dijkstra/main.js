@@ -56,8 +56,8 @@ const controls = new OrbitControls(camera, renderer.domElement);    //allows the
 //***************************************************************************** */
 
 
-const NUM_NODES = 5;    //NUMBER OF NODES IN THR GRAPH
-const MAX_EDGES_PER_NODE = 5;
+const NUM_NODES = 7;    //NUMBER OF NODES IN THR GRAPH
+const MAX_EDGES_PER_NODE = 3;
 
 //MAY END UP NOT USING GUI FOLDERS
 // const gui = new GUI()     //create a new gui element
@@ -279,7 +279,6 @@ function generateEdges(){
   
     const newEdge4 = new Edge(nodeArray[nodeArray.length-1], randNode, color);
       // addEdge(nodeArray[nodeArray.length-1], randNode, color);    //add the randomly created edge to the scene
-    
   }
 }
 
@@ -361,7 +360,7 @@ class MinHeap{
    * @param {*} heapNode 
    */
   insert(heapNode){
-
+   
     this.heap.push(heapNode);   //inserts a node at the end of the heap;
 
     if (this.heap.length > 1) {   //if the length of the heap is greater than 1
@@ -370,7 +369,7 @@ class MinHeap{
       
       //while the heapNodes distance is less than its parent node, move up
       while(currentNodePos > 1 && this.heap[Math.floor(currentNodePos/2)].distance > this.heap[currentNodePos].distance ){
-
+        
         /* Swapping the two nodes by using the ES6 destructuring syntax*/
         [this.heap[Math.floor(currentNodePos/2)], this.heap[currentNodePos]] = [this.heap[currentNodePos], this.heap[Math.floor(currentNodePos/2)]];
 
@@ -395,12 +394,41 @@ class MinHeap{
     }
 	}
 
+  heapify(i)
+    {
+        let smallest = i; // Initialize smallest as root
+        let leftChild = 2 * i; 
+        let rightChild = 2 * i + 1; 
+   
+        // If left child is smaller than smallest so far
+        if (leftChild < this.heap.length && this.heap[leftChild].distance <= this.heap[smallest].distance){
+          smallest = leftChild;
+          this.heapify(smallest);
+        }
+   
+        // If right child is smaller than smallest so far
+        if (rightChild < this.heap.length && this.heap[rightChild].distance < this.heap[smallest].distance){
+          smallest = rightChild;
+          this.heapify(smallest);
+        }
+   
+        // If smallest is not root
+        if (smallest != i)
+        {
+            [this.heap[i], this.heap[smallest]] = [this.heap[smallest], this.heap[i]];
+  
+            // Recursively heapify the affected sub-tree
+            this.heapify(smallest);
+        }
+      
+    }
+
   remove(){
+    console.log("\n");
 
     let smallest = this.heap[1];      //save the smallest value
-
-    // console.log("smallest: " + smallest.distance);
-
+    // console.log("Node Removed: " + smallest.nodeName + " with distance of: " + smallest.distance);
+    
     //When there are more than 2 elements in the array, the rightmost element takes the first elements place
 
     if(this.heap.length > 2){
@@ -408,48 +436,7 @@ class MinHeap{
       this.heap[1] = this.heap[this.heap.length-1];   //rightmost item in heap replaces the root
 
       this.heap.splice(this.heap.length-1);   //remove the last position in the heap completely
-
-      //if there are only 2 items in the min heap  (length 3 because of the [0] null position)
-      if(this.heap.length === 3){   
-
-        if(this.heap[1].distance > this.heap[2].distance){    //if the parent is larger than the child
-          [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]]; //Swap the larger parent with the only child
-        }
-        
-        return smallest;
-      }
-    
-
-    //Current Node and child node positions:
-    let currentPos = 1;
-    let leftChild = 2 * currentPos;
-    let rightChild = 2 * currentPos + 1;
-
-    //while there are still left and right child nodes
-    // AND the current nodes distance is more than one of the childrens distance
-    //swap the current node with the smaller of the child nodes
-    while (this.heap[leftChild] &&
-            this.heap[rightChild] &&
-            (this.heap[currentPos].distance > this.heap[leftChild].distance ||
-            this.heap[currentPos].distance > this.heap[rightChild].distance)){
-
-        if(this.heap[rightChild].distance < this.heap[leftChild].distance){ // if the right child is smaller
-          //swap with the right
-          [this.heap[currentPos], this.heap[rightChild]] = [this.heap[rightChild], this.heap[currentPos]];
-          currentPos = leftChild;
-        } 
-        else{ // if the left child is smaller
-          //swap with the left
-          [this.heap[currentPos], this.heap[leftChild]] = [this.heap[leftChild], this.heap[currentPos]];
-          currentPos = rightChild;
-        }
-
-        //update left and right child positions
-        leftChild = 2 * currentPos;
-        rightChild = 2 * currentPos + 1;
-      }
     }
-
     //if there is only 1 item left in the heap
     else if( this.heap.length === 2){
       this.heap.splice(1,1);    //remove it from the heap
@@ -457,6 +444,7 @@ class MinHeap{
     else{
       return null;    //return null if attempted to remove a node when there are none in the heap
     }
+
     return smallest;  // return the smallest node that was removed from the heap
   }
 }
@@ -488,38 +476,48 @@ class MinHeap{
   for(let i = 0; i < nodeArray.length; i++){
     minHeap.insert(nodeArray[i]);
   }
+  
   // console.log("minheap len: " + minHeap.heap.length)
     // while Q != null
   while(minHeap.heap.length > 1){
     // u = extract_min
+   
+    // minHeap.printHeap();
+    //extract node 4
     let u = minHeap.remove();
+   
 
     // S = S U {u} 
+    //add node 4 to final set
     finalSet.push(u);
-
     
 
     // for each vertex v in adj[u] 
+    // for each vertex adjacent to vertex 4
+          // update its distance
     // relax(u,v,w)
-    for(let i = 0; i < adjList[u.nodeNum].length; i++){
+    for(let i = 0; i < adjList[u.nodeNum].length; i++){ //loop through all adjacent nodes and update their distances
+      // console.log("*** RELAX");
+      // console.log("*** "+adjList[u.nodeNum][i].node.nodeName);
       if(adjList[u.nodeNum][i].node.distance > (u.distance + adjList[u.nodeNum][i].edge.weight)){
         adjList[u.nodeNum][i].node.distance = u.distance + adjList[u.nodeNum][i].edge.weight;
+        // console.log("*** distance to " + adjList[u.nodeNum][i].node.nodeName + ": " + adjList[u.nodeNum][i].node.distance)
       }
     }
-          
+    minHeap.heapify(1);
   }
 
   //Loop to cover base case for coloring shortest path, if the end node is directly connected to the source node
-  for(let i = 0; i < adjList[startNodeNum].length; i++){
-  if(endNodeNum === adjList[startNodeNum][i].node.nodeNum){
-    var colorEdge = new Edge(nodeArray[startNodeNum-1], nodeArray[endNodeNum-1], WHITE);
-  }
-}
+//   for(let i = 0; i < adjList[startNodeNum].length; i++){
+//   if(endNodeNum === adjList[startNodeNum][i].node.nodeNum){
+//     var colorEdge = new Edge(nodeArray[startNodeNum-1], nodeArray[endNodeNum-1], WHITE);
+//   }
+// }
 
   console.log("\nDistance from Node " + startNodeNum + " to: ")
   for(let i = 0; i < finalSet.length;i++){
     console.log("Node " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
-}
+  }
 
 
   //************* MinHeap Test Output **************/
@@ -531,6 +529,7 @@ class MinHeap{
 
 dijkstra_spt(4, 3)
 
+console.log("END")
 
 
 
