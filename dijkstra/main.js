@@ -57,7 +57,7 @@ const controls = new OrbitControls(camera, renderer.domElement);    //allows the
 
 
 const NUM_NODES = 7;    //NUMBER OF NODES IN THR GRAPH
-const MAX_EDGES_PER_NODE = 3;
+const MAX_EDGES_PER_NODE = 4;
 
 //MAY END UP NOT USING GUI FOLDERS
 // const gui = new GUI()     //create a new gui element
@@ -69,21 +69,6 @@ const MAX_EDGES_PER_NODE = 3;
  */
 class Node {
   constructor(nodeNum, nodeName, color) {
-    if(nodeNum === 1){
-      color = WHITE
-    }
-    if(nodeNum === 2){
-      color = RED
-    }
-    if(nodeNum === 3){
-      color = GREEN
-    }
-    if(nodeNum === 4){
-      color = YELLOW
-    }
-    if(nodeNum === 5){
-      color = BLUE
-    }
     const geometry = new THREE.SphereGeometry(2,24,24);      //creates a sphere geometry
     const material = new THREE.MeshStandardMaterial({color: color}); //sets the sphere material
     const node = new THREE.Mesh(geometry, material);    //creates a new 'node' onject with both the geometry and material specified
@@ -455,79 +440,62 @@ class MinHeap{
  * @param {*} startNode pass in a start node to calculate dijkstra spt on
  * @param {*} endNode   pass in an end node that the algorithm will terminate on once reached
  */
- function dijkstra_spt(startNodeNum, endNodeNum){
+ function dijkstra_spt(startNodeNum){
   
   // initilaize_single_source
-  
-  // nodeArray.forEach(element => {     //not neaded because all new nodes are initialized with a distance of Infinity
-  //   element.distance = Infinity;
-  // });
  
   nodeArray[startNodeNum-1].distance = 0;   //initializes the startNode distance to zero
   nodeArray[startNodeNum-1].visited = 1;    //initializes the startNode visited to 1
   
   // maintain a set finalSet of vertices whose final shortest-path weights from the source startNodeNum have already been determined.
   let finalSet = []
-
+  let finalSet2 = [];
   // initialize min-priority queue Q of vertices, keyed by their d values.
   var minHeap = new MinHeap();
 
   //insert all nodes in the graph into the min heap
   for(let i = 0; i < nodeArray.length; i++){
     minHeap.insert(nodeArray[i]);
+    let x = new Array();
+    finalSet2[i] = x;
   }
   
   // console.log("minheap len: " + minHeap.heap.length)
     // while Q != null
+  
   while(minHeap.heap.length > 1){
     // u = extract_min
    
     // minHeap.printHeap();
     //extract node 4
     let u = minHeap.remove();
-   
 
     // S = S U {u} 
     //add node 4 to final set
     finalSet.push(u);
-    
 
     // for each vertex v in adj[u] 
     // for each vertex adjacent to vertex 4
           // update its distance
     // relax(u,v,w)
     for(let i = 0; i < adjList[u.nodeNum].length; i++){ //loop through all adjacent nodes and update their distances
-      // console.log("*** RELAX");
-      // console.log("*** "+adjList[u.nodeNum][i].node.nodeName);
       if(adjList[u.nodeNum][i].node.distance > (u.distance + adjList[u.nodeNum][i].edge.weight)){
         adjList[u.nodeNum][i].node.distance = u.distance + adjList[u.nodeNum][i].edge.weight;
-        // console.log("*** distance to " + adjList[u.nodeNum][i].node.nodeName + ": " + adjList[u.nodeNum][i].node.distance)
       }
     }
-    minHeap.heapify(1);
-  }
 
-  //Loop to cover base case for coloring shortest path, if the end node is directly connected to the source node
-//   for(let i = 0; i < adjList[startNodeNum].length; i++){
-//   if(endNodeNum === adjList[startNodeNum][i].node.nodeNum){
-//     var colorEdge = new Edge(nodeArray[startNodeNum-1], nodeArray[endNodeNum-1], WHITE);
-//   }
-// }
+    minHeap.heapify(1);
+
+  }
 
   console.log("\nDistance from Node " + startNodeNum + " to: ")
   for(let i = 0; i < finalSet.length;i++){
     console.log("Node " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
   }
-
-
-  //************* MinHeap Test Output **************/
-  // minHeap.printHeap();
-  
-  //****************************************/
   
 }
 
-dijkstra_spt(4, 3)
+dijkstra_spt(1)
 
 console.log("END")
 
