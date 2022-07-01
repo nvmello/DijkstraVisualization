@@ -56,7 +56,7 @@ const controls = new OrbitControls(camera, renderer.domElement);    //allows the
 //***************************************************************************** */
 
 
-const NUM_NODES = 7;    //NUMBER OF NODES IN THR GRAPH
+const NUM_NODES = 15;    //NUMBER OF NODES IN THR GRAPH
 const MAX_EDGES_PER_NODE = 4;
 
 //MAY END UP NOT USING GUI FOLDERS
@@ -69,6 +69,21 @@ const MAX_EDGES_PER_NODE = 4;
  */
 class Node {
   constructor(nodeNum, nodeName, color) {
+    // if(nodeNum === 1){
+    //   color = WHITE
+    // }
+    // if(nodeNum === 2){
+    //   color = PINK
+    // }
+    // if(nodeNum === 3){
+    //   color = GREEN
+    // }
+    // if(nodeNum === 4){
+    //   color = YELLOW
+    // }
+    // if(nodeNum === 5){
+    //   color = BLUE
+    // }
     const geometry = new THREE.SphereGeometry(2,24,24);      //creates a sphere geometry
     const material = new THREE.MeshStandardMaterial({color: color}); //sets the sphere material
     const node = new THREE.Mesh(geometry, material);    //creates a new 'node' onject with both the geometry and material specified
@@ -79,6 +94,8 @@ class Node {
 
     this.visited = 0;   //this variable will be used in dijkstras to tell if the nod has been visited yet
     this.distance = Infinity;     //property of dijkstras, begin will all nodes distance being set to infinity
+
+    this.parent = null;   //added a parent variable that keeps track of this nodes most recent parent node in the shortest path tree
 
     this.coord = new THREE.Vector3(this.x, this.y, this.z);
     this.nodeNum = nodeNum;
@@ -171,7 +188,7 @@ class Edge{
     // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
     const edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper
 
-   
+    // edge.line.material.linewidth = 20;
    
     
     if(!adjList[startNode.nodeNum].includes(endNode) && startNode.nodeNum != endNode.nodeNum){
@@ -440,7 +457,7 @@ class MinHeap{
  * @param {*} startNode pass in a start node to calculate dijkstra spt on
  * @param {*} endNode   pass in an end node that the algorithm will terminate on once reached
  */
- function dijkstra_spt(startNodeNum){
+ function dijkstra_spt(startNodeNum, endNodeNum){
   
   // initilaize_single_source
  
@@ -449,7 +466,7 @@ class MinHeap{
   
   // maintain a set finalSet of vertices whose final shortest-path weights from the source startNodeNum have already been determined.
   let finalSet = []
-  let finalSet2 = [];
+
   // initialize min-priority queue Q of vertices, keyed by their d values.
   var minHeap = new MinHeap();
 
@@ -457,7 +474,7 @@ class MinHeap{
   for(let i = 0; i < nodeArray.length; i++){
     minHeap.insert(nodeArray[i]);
     let x = new Array();
-    finalSet2[i] = x;
+
   }
   
   // console.log("minheap len: " + minHeap.heap.length)
@@ -466,10 +483,11 @@ class MinHeap{
   while(minHeap.heap.length > 1){
     // u = extract_min
    
-    // minHeap.printHeap();
+    minHeap.printHeap();
     //extract node 4
     let u = minHeap.remove();
 
+    console.log("\nu: " + u.nodeName + " dist: " + u.distance);
     // S = S U {u} 
     //add node 4 to final set
     finalSet.push(u);
@@ -480,6 +498,7 @@ class MinHeap{
     // relax(u,v,w)
     for(let i = 0; i < adjList[u.nodeNum].length; i++){ //loop through all adjacent nodes and update their distances
       if(adjList[u.nodeNum][i].node.distance > (u.distance + adjList[u.nodeNum][i].edge.weight)){
+        adjList[u.nodeNum][i].node.parent = nodeArray[u.nodeNum-1];
         adjList[u.nodeNum][i].node.distance = u.distance + adjList[u.nodeNum][i].edge.weight;
       }
     }
@@ -492,10 +511,30 @@ class MinHeap{
   for(let i = 0; i < finalSet.length;i++){
     console.log("Node " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
   }
+
+
+  //Array to keep track of the nodes traversed to the endNode
+  let finalPath = [];
+  let temp = nodeArray[endNodeNum-1];   //temp var for end node
   
+  /**
+   * While loop for overwriting the edges with a different color to highlight the path taken
+   */
+  while( temp.parent != null && temp.nodeNum != startNodeNum){
+    finalPath.push(temp);
+    console.log(temp.parent.nodeNum);
+    let colorPath = new Edge(temp.parent, temp, RED);
+    temp = temp.parent;
+  } 
+  finalPath.push(nodeArray[startNodeNum-1]);
+
+  //xonsole output of the path taken
+  console.log("\nPath Taken:");
+  finalPath.reduceRight((_, item) => console.log("      " + item.nodeName), null);
+
 }
 
-dijkstra_spt(1)
+dijkstra_spt(4, 3)
 
 console.log("END")
 
