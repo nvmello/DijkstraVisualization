@@ -149,17 +149,17 @@ class Edge{
    *    recursive -- if true, descendants of the object are also cloned. Default is true.
    *    Returns a clone of this object and optionally all descendants.
    */
-    var direction = (endNode.coord).clone().sub(startNode.coord);     //calculates the direction between the two nodes
+    this.direction = (this.endNode.coord).clone().sub(this.startNode.coord);     //calculates the direction between the two nodes
 
-    var length = direction.length();  //calculates the distance between 2 nodes
-    this.weight = length;
+    this.length = this.direction.length();  //calculates the distance between 2 nodes
+    this.weight = this.length;
   
     // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
-    const edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper   
+    this.edge = new THREE.ArrowHelper(this.direction.normalize(), this.startNode.coord, this.length, this.color, 10,5 );  //creates the edge using arrowHelper   
     
-    if(!adjList[startNode.nodeNum].includes(endNode) && startNode.nodeNum != endNode.nodeNum){
+    if(!adjList[startNode.nodeNum].includes(this.endNode) && this.startNode.nodeNum != this.endNode.nodeNum){
 
-      scene.add( edge );   //adds arrowHelper to scene
+      scene.add( this.edge );   //adds arrowHelper to scene
     }
     return this.edge;
   }
