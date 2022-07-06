@@ -241,7 +241,7 @@ function generateEdges(){
  * consoleConnectionsLog is a function that prints all the nodes and their connections to the console
  */
 function consoleConnectionsLog(){
-  console.log("\tNumber of Nodes: " + adjList.length-1 )
+  console.log("\tNumber of Nodes: " + (adjList.length-1) )
   for(let i = 1; i < adjList.length; i++){
     console.log("Node " + i +  ":");
     for(let j = 0; j < adjList[i].length; j++){
