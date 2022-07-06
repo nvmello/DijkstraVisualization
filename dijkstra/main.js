@@ -157,7 +157,7 @@ class Edge{
     // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
     this.edge = new THREE.ArrowHelper(this.direction.normalize(), this.startNode.coord, this.length, this.color, 10,5 );  //creates the edge using arrowHelper   
     
-    if(!adjList[startNode.nodeNum].includes(this.endNode) && this.startNode.nodeNum != this.endNode.nodeNum){
+    if(!adjList[this.startNode.nodeNum].includes(this.endNode) && this.startNode.nodeNum != this.endNode.nodeNum){
 
       scene.add( this.edge );   //adds arrowHelper to scene
     }
