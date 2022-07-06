@@ -1,5 +1,5 @@
 import './style.css'
-import * as THREE from 'three';
+import * as THREE from 'dijkstra\node_modules\three';
 import { GUI } from 'dat.gui'
 import { OrbitControls } from 'dijkstra\node_modules\three\examples\jsm\controls\OrbitControls.js';
 
