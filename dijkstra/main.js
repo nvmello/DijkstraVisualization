@@ -19,6 +19,9 @@ const BLUE = 0x0000ff;
 const YELLOW = 0xffff00;
 const PINK = 0xff00ff;
 const WHITE = 0xffffff;
+const PURPLE = 0x9004bf;
+const TEAL = 0x53c9b2;
+const GRAY = 0xa2a0a3;
 
 
 const scene = new THREE.Scene();    //Creates the container to hold all objects, cameras, lights
@@ -69,24 +72,10 @@ const MAX_EDGES_PER_NODE = 4;
  */
 class Node {
   constructor(nodeNum, nodeName, color) {
-    // if(nodeNum === 1){
-    //   color = WHITE
-    // }
-    // if(nodeNum === 2){
-    //   color = PINK
-    // }
-    // if(nodeNum === 3){
-    //   color = GREEN
-    // }
-    // if(nodeNum === 4){
-    //   color = YELLOW
-    // }
-    // if(nodeNum === 5){
-    //   color = BLUE
-    // }
-    const geometry = new THREE.SphereGeometry(2,24,24);      //creates a sphere geometry
-    const material = new THREE.MeshStandardMaterial({color: color}); //sets the sphere material
-    const node = new THREE.Mesh(geometry, material);    //creates a new 'node' onject with both the geometry and material specified
+  
+    this.geometry = new THREE.SphereGeometry(2,24,24);      //creates a sphere geometry
+    this.material = new THREE.MeshStandardMaterial({color: color}); //sets the sphere material
+    this.node = new THREE.Mesh(this.geometry, this.material);    //creates a new 'node' onject with both the geometry and material specified
     this.x = THREE.MathUtils.randFloatSpread(GRID_SIZE/2) ;  //randomly generates a unique x,y,z value for each star
     this.y = THREE.MathUtils.randFloatSpread(GRID_SIZE/2) ;  //randomly generates a unique x,y,z value for each star
     this.z = THREE.MathUtils.randFloatSpread(GRID_SIZE/2) ;  //randomly generates a unique x,y,z value for each star
@@ -100,45 +89,29 @@ class Node {
     this.coord = new THREE.Vector3(this.x, this.y, this.z);
     this.nodeNum = nodeNum;
     this.nodeName = nodeName;
-    // console.log(nodeName);  //test code for the console
 
-     //MAY NOT END UP USING THE FOLDERS
-    // this.nodeFolder = gui.addFolder(nodeName);   //adds folders to the gui window
-
-    //I am hoping to be able to use this part of the code to allow the user to determine the weights of edges
-      //may have to move this to the addEdge() function
-    // nodeFolder.add(node.rotation, 'x', 0, 10); //adds a node folder for each node created, 
-
-    node.position.set(this.x,this.y,this.z);   //sets each stars position to the randomly generated x,y,z position calculated previously
-    scene.add(node);    //adds each star to the scene once it is created
+    this.node.position.set(this.x,this.y,this.z);   //sets each stars position to the randomly generated x,y,z position calculated previously
+    scene.add(this.node);    //adds each star to the scene once it is created
   }
 }
 
 var nodeArray = []; //array to store the vector3 positions of each node
-
 
 /**
  * addNode()
  * function will create a node every time called
  */
 function addNode(numNodes){
-  var color = BLUE;
+  var color = WHITE;
   for( var i = 0; i < numNodes; i++){ //loop to fill nodeArray
     var nodeNum = (i+1);  // gives the node a unique number
     var nodeName = "Node " + nodeNum ;//Names each node for the gui
     
-    
-    // console.log("NODENAME: " + nodeName);
-    
     const myNode = new Node(nodeNum, nodeName, color);
-    // console.log("myNode.x");
-    // console.log(myNode.x);
-    // nodeArray[i] = new THREE.Vector3(myNode.x, myNode.y, myNode.z);
+
     nodeArray[i] = myNode;
   }
 }
-
-
 
 /**
  * initAdjacencyList initializes the adjacency list
@@ -157,8 +130,6 @@ function initAdjacencyList(){
     }
   }
 }
-
-
 
 /************************************************************************************************/
 
@@ -186,18 +157,9 @@ class Edge{
     this.weight = length;
   
     // ArrowHelper(dir : Vector3, origin : Vector3, length : Number, hex : Number, headLength : Number, headWidth : Number )
-    const edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper
-
-    // edge.line.material.linewidth = 20;
-   
+    const edge = new THREE.ArrowHelper(direction.normalize(), startNode.coord, length, color, 10,5 );  //creates the edge using arrowHelper   
     
     if(!adjList[startNode.nodeNum].includes(endNode) && startNode.nodeNum != endNode.nodeNum){
-      // console.log("node: " + startNode.nodeNum + " --------> " + "node: " + endNode.nodeNum);
-      
-      // const newPair = new NodeEdgePair(endNode, edge);    //pair that contains the destination node and the edge that points to it
-
-      // adjList[startNode.nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
-      //                                             // this should make the code more lightweight when running dijstras 
 
       scene.add( edge );   //adds arrowHelper to scene
     }
@@ -229,51 +191,42 @@ class NodeEdgePair{
  * The remaining edges are randomly chosen
  */
 function generateEdges(){
-  var color = GREEN
+  var color = PURPLE;
   const newEdge = new Edge(nodeArray[nodeArray.length-1], nodeArray[0], color);
   var newPair = new NodeEdgePair(nodeArray[0], newEdge);    //pair that contains the destination node and the edge that points to it
 
-  // if(!adjList[nodeArray[nodeArray.length-1].nodeNum].includes(nodeArray[0]) && nodeArray[nodeArray.length-1].nodeNum != nodeArray[0].nodeNum){
-    adjList[nodeArray[nodeArray.length-1].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
-  // }
-                                                  // this should make the code more lightweight when running dijstras 
-  // addEdge(nodeArray[nodeArray.length-1], nodeArray[0], color);   //this connects node[n] to node[0] creating a loop
-                                                            // assuring every node is reachable via any other node
+  adjList[nodeArray[nodeArray.length-1].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair, 
+
   //loop to connect the rest of the nodes                                                          
   for(var i = 0; i < nodeArray.length-1; i++){
-    // console.log("i = " + i);
+
     const newEdge2 = new Edge(nodeArray[i], nodeArray[i+1], color);
     newPair = new NodeEdgePair(nodeArray[i+1], newEdge2);    //pair that contains the destination node and the edge that points to it
 
-    // if(!adjList[nodeArray[i].nodeNum].includes(nodeArray[i+1]) && nodeArray[i].nodeNum != nodeArray[i+1].nodeNum){
-          adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair,         
-    // }
-      // addEdge(nodeArray[i], nodeArray[i+1], color);  //this connects node[0] to node[1] to node[2].... to node[n-1]
+    adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair,         
 
+    for(var j = 0; j < Math.floor(Math.random()*MAX_EDGES_PER_NODE); j++){ //this loop creats a random number of connections for each node
+      var flag = true;    //flag to control if a node edge is added to the adjacency list
+      
+      var randNode = nodeArray[Math.floor(Math.random()*nodeArray.length)];    //select a random node for the created edge to travel to
 
-        for(var j = 0; j < Math.floor(Math.random()*MAX_EDGES_PER_NODE); j++){ //this loop creats a random number of connections for each node
-          var flag = true;    //flag to control if a node edge is added to the adjacency list
-          color = GREEN;
-          var randNode = nodeArray[Math.floor(Math.random()*nodeArray.length)];    //select a random node for the created edge to travel to
-
-          //Loop to keep track of if a node is already connected to the randomly selected node, if it is, 
-          //  dont add it to the adjacency list again
-          for(let k = 0; k < adjList[nodeArray[i].nodeNum].length;k++){
-            if(adjList[nodeArray[i].nodeNum][k].node.nodeNum == randNode.nodeNum){
-              flag = false;     //deny node from being added
-              break;
-            }
-          }
-          
-          const newEdge3 = new Edge(nodeArray[i], randNode, color);
-          newPair = new NodeEdgePair(randNode, newEdge3);    //pair that contains the destination node and the edge that points to it
-
-
-          if(flag && nodeArray[i].nodeNum != randNode.nodeNum){
-            adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair,   
-          }
-
+      //Loop to keep track of if a node is already connected to the randomly selected node, if it is, 
+      //  dont add it to the adjacency list again
+      for(let k = 0; k < adjList[nodeArray[i].nodeNum].length;k++){
+        if(adjList[nodeArray[i].nodeNum][k].node.nodeNum == randNode.nodeNum){
+          flag = false;     //deny node from being added
+          break;
         }
+      }
+      
+      const newEdge3 = new Edge(nodeArray[i], randNode, color);
+      newPair = new NodeEdgePair(randNode, newEdge3);    //pair that contains the destination node and the edge that points to it
+
+      if(flag && nodeArray[i].nodeNum != randNode.nodeNum){
+        adjList[nodeArray[i].nodeNum].push(newPair);   //fills the adjacency list with the node and edge pair,   
+      }
+
+    }
   }
   
   for(var j = 0; j < Math.floor(Math.random()*MAX_EDGES_PER_NODE); j++){ //this loop creats a random number of connections for each node
@@ -324,12 +277,7 @@ initAdjacencyList();
 
 // Call to generateEdges
 generateEdges();
-// var testEdge = new Edge(nodeArray[0], nodeArray[2], BLUE);
-// testEdge = new Edge(nodeArray[0], nodeArray[2], WHITE);
 
-// const testEdge2 = new Edge(nodeArray[0], nodeArray[2], WHITE);
-
-/************************************************************************************************/
 
 //Call to print all of the connections to the console
 consoleConnectionsLog();
@@ -398,18 +346,17 @@ class MinHeap{
 
   heapify(i)
     {
-        let smallest = i; // Initialize smallest as root
+        
         let leftChild = 2 * i; 
         let rightChild = 2 * i + 1; 
-   
-        // If left child is smaller than smallest so far
+        let smallest = i; // Initialize smallest as root
+        
         if (leftChild < this.heap.length && this.heap[leftChild].distance <= this.heap[smallest].distance){
           smallest = leftChild;
           this.heapify(smallest);
         }
-   
-        // If right child is smaller than smallest so far
-        if (rightChild < this.heap.length && this.heap[rightChild].distance < this.heap[smallest].distance){
+
+        if (rightChild < this.heap.length && this.heap[rightChild].distance <= this.heap[smallest].distance){
           smallest = rightChild;
           this.heapify(smallest);
         }
@@ -429,10 +376,8 @@ class MinHeap{
     console.log("\n");
 
     let smallest = this.heap[1];      //save the smallest value
-    // console.log("Node Removed: " + smallest.nodeName + " with distance of: " + smallest.distance);
     
     //When there are more than 2 elements in the array, the rightmost element takes the first elements place
-
     if(this.heap.length > 2){
 
       this.heap[1] = this.heap[this.heap.length-1];   //rightmost item in heap replaces the root
@@ -460,7 +405,8 @@ class MinHeap{
  function dijkstra_spt(startNodeNum, endNodeNum){
   
   // initilaize_single_source
- 
+  nodeArray[startNodeNum-1].material.color.setHex( GREEN ); //colors start node Green
+  nodeArray[endNodeNum-1].material.color.setHex( RED );   //colors end node Red
   nodeArray[startNodeNum-1].distance = 0;   //initializes the startNode distance to zero
   nodeArray[startNodeNum-1].visited = 1;    //initializes the startNode visited to 1
   
@@ -477,39 +423,33 @@ class MinHeap{
 
   }
   
-  // console.log("minheap len: " + minHeap.heap.length)
-    // while Q != null
-  
+  // while Q != null
   while(minHeap.heap.length > 1){
     // u = extract_min
    
-    minHeap.printHeap();
-    //extract node 4
     let u = minHeap.remove();
 
-    console.log("\nu: " + u.nodeName + " dist: " + u.distance);
     // S = S U {u} 
-    //add node 4 to final set
     finalSet.push(u);
 
-    // for each vertex v in adj[u] 
-    // for each vertex adjacent to vertex 4
-          // update its distance
     // relax(u,v,w)
     for(let i = 0; i < adjList[u.nodeNum].length; i++){ //loop through all adjacent nodes and update their distances
+      // if the previous distance is larger than the new distance, update the previous distance to the updated shorter value
       if(adjList[u.nodeNum][i].node.distance > (u.distance + adjList[u.nodeNum][i].edge.weight)){
         adjList[u.nodeNum][i].node.parent = nodeArray[u.nodeNum-1];
         adjList[u.nodeNum][i].node.distance = u.distance + adjList[u.nodeNum][i].edge.weight;
       }
     }
 
+    // Call heapify after updating distances in the minheap.
     minHeap.heapify(1);
 
   }
 
+  //Loop to show the distances to every node in the graph
   console.log("\nDistance from Node " + startNodeNum + " to: ")
   for(let i = 0; i < finalSet.length;i++){
-    console.log("Node " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
+    console.log("\tNode " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
   }
 
 
@@ -522,23 +462,20 @@ class MinHeap{
    */
   while( temp.parent != null && temp.nodeNum != startNodeNum){
     finalPath.push(temp);
-    console.log(temp.parent.nodeNum);
-    let colorPath = new Edge(temp.parent, temp, RED);
+    let colorPath = new Edge(temp.parent, temp, YELLOW);
     temp = temp.parent;
   } 
   finalPath.push(nodeArray[startNodeNum-1]);
 
   //xonsole output of the path taken
-  console.log("\nPath Taken:");
-  finalPath.reduceRight((_, item) => console.log("      " + item.nodeName), null);
-
+  console.log("\nShortest path taken from " + finalPath[finalPath.length-1].nodeName + " to " + finalPath[0].nodeName + ": ");
+  console.log("START");
+  // Reduce right calls the specified callback function for all the elements in an array, in descending order.
+  finalPath.reduceRight((_, item) => console.log("\t" + item.nodeName), null);
+  console.log("END");
 }
 
 dijkstra_spt(4, 3)
-
-console.log("END")
-
-
 
 //***************************** Render Loop ************************************************ */
 //Animate the scene with an infitite recursive loop that continually calls render
@@ -549,11 +486,3 @@ function animate(){
 }
 
 animate();      //call our recursive animate function
-
-
-
-
-// var updatedEdge = new Edge(adjList[1][1].node, nodeArray[0], WHITE);
-//   console.log("weight: " + updatedEdge.weight);
-
-
