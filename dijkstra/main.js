@@ -426,7 +426,7 @@ class MinHeap{
     // u = extract_min
    
     let u = minHeap.remove();
-
+    
     // S = S U {u} 
     finalSet.push(u);
 
@@ -469,7 +469,11 @@ class MinHeap{
   console.log("\nShortest path taken from " + finalPath[finalPath.length-1].nodeName + " to " + finalPath[0].nodeName + ": ");
   console.log("START");
   // Reduce right calls the specified callback function for all the elements in an array, in descending order.
-  finalPath.reduceRight((_, item) => console.log("\t" + item.nodeName), null);
+  finalPath.reduceRight((_, item) => { 
+    console.log("\t" + item.nodeName);
+    item.material.color.setHex( YELLOW );
+   }, null);
+  
   console.log("END");
 }
 
