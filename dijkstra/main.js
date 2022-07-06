@@ -1,5 +1,5 @@
-import * as THREE from '/node_modules/three';
-import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '/DijkstraVisualization/node_modules/three';
+import { OrbitControls } from '/DijkstraVisualization/node_modules/three/examples/jsm/controls/OrbitControls.js';
 
 
 
