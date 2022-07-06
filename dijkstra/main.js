@@ -403,8 +403,7 @@ class MinHeap{
  function dijkstra_spt(startNodeNum, endNodeNum){
   
   // initilaize_single_source
-  nodeArray[startNodeNum-1].material.color.setHex( GREEN ); //colors start node Green
-  nodeArray[endNodeNum-1].material.color.setHex( RED );   //colors end node Red
+  
   nodeArray[startNodeNum-1].distance = 0;   //initializes the startNode distance to zero
   nodeArray[startNodeNum-1].visited = 1;    //initializes the startNode visited to 1
   
@@ -473,6 +472,8 @@ class MinHeap{
     console.log("\t" + item.nodeName);
     item.material.color.setHex( YELLOW );
    }, null);
+  nodeArray[startNodeNum-1].material.color.setHex( GREEN ); //colors start node Green
+  nodeArray[endNodeNum-1].material.color.setHex( RED );   //colors end node Red
   
   console.log("END");
 }
