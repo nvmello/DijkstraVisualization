@@ -5,7 +5,7 @@ var app = express();
 var http = require('http');
 var server = http.Server(app);
 
-app.use(express.static('dijkstra'));
+app.use(express.static('dijkstra' + '/public'));
 
 server.listen(PORT, function() {
   console.log('Dijkstra Visualization Running');
