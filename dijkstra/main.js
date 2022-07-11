@@ -442,12 +442,8 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
 
   }
 
-  //Loop to show the distances to every node in the graph
+  //Code to show the distances to every node in the graph
   console.log("\nDistance from Node " + startNodeNum + " to: ")
-  // for (let i = 0; i < finalSet.length; i++) {
-  //   console.log("\tNode " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
-  // }
-
   var myWeightTable = document.getElementById("weightTableId");
   finalSet.forEach(function (weightRows) {
     var wght = myWeightTable.insertRow(-1);
@@ -476,6 +472,9 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
 
   finalPath.reverse;  //reverse the path array so we can easily traverse in order
 
+  /**
+   * Code to print out the final path taken to the endnode
+   */
   var myPathTable = document.getElementById("pathTableId");
   finalPath.forEach(function (dataRows) {
     var row = myPathTable.insertRow(-1);

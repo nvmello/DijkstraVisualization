@@ -36,3 +36,21 @@ table {
   right: 0;
   color: rgb(197, 197, 197);
 }
+
+#overlayTitle {
+
+  position: relative;
+  text-align: center;
+  color: yellow;
+  /* Add This*/
+}
+
+#overlayCredit {
+  position: fixed;
+  left: 50%;
+  bottom: 10px;
+  transform: translate(-50%, -50%);
+  margin: 0 auto;
+  color: yellow;
+  /* Add This*/
+}
