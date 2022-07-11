@@ -1,5 +1,38 @@
-canvas{
+canvas {
   position: fixed;
   top: 0;
   left: 0;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+table {
+  text-indent: 2em;
+}
+
+#overlay {
+  background-color: rgba(154, 59, 154, 0.53);
+  width: auto;
+  margin: auto;
+  padding: 1em;
+  border: 3px solid yellow;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgb(197, 197, 197);
+}
+
+#overlay2 {
+  background-color: rgba(154, 59, 154, 0.53);
+  width: auto;
+  margin: auto;
+  padding: 1em;
+  border: 3px solid yellow;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  color: rgb(197, 197, 197);
 }

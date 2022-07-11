@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
-    <script type="importmap">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+  <script type="importmap">
       {
           "imports": {
               "three": "https://unpkg.com/three@0.138.0/build/three.module.js",
@@ -13,16 +14,33 @@
       }
   </script>
 
-    <title>Dijkstra Visualization, by Nick Morello</title>
-  </head>
-  <body>
-    <div id="app"></div>
+  <title>Dijkstra Visualization, by Nick Morello</title>
+</head>
 
-    
+<body>
 
-    <canvas id="bg"></canvas>
+  <div id="app"></div>
 
 
-    <script type="module" src="main.js"></script>
-  </body>
+
+  <canvas id="bg"></canvas>
+
+  <div id="overlay">
+    <h1>Path</h1>
+    <h4>Start:</h4>
+    <table id="pathTableId"></table>
+    <h4>End</h4>
+  </div>
+
+
+  <div id="overlay2">
+    <h1>Distance From:</h1>
+    <table id="weightTableId"></table>
+
+  </div>
+
+  <script type="module" src="main.js"></script>
+
+</body>
+
 </html>

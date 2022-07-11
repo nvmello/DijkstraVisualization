@@ -8,8 +8,8 @@ import { OrbitControls } from 'OrbitControls';
  ******************************* Scene setup *********************************
  */
 
-const GRID_SIZE = 200;
-const GRID_DIVISIONS = 25;
+const GRID_SIZE = 400;
+const GRID_DIVISIONS = 50;
 
 //color hex values
 const RED = 0xff0000;
@@ -33,7 +33,7 @@ const renderer = new THREE.WebGL1Renderer({   //Actually renders the graphics to
 
 renderer.setPixelRatio(window.devicePixelRatio);    //Sets device pixel ratio.
 
-renderer.setSize(window.innerWidth / 2, window.innerHeight);  //Resizes the output canvas to (width, height) with 
+renderer.setSize(window.innerWidth, window.innerHeight);  //Resizes the output canvas to (width, height) with 
 //device pixel ratio taken into account
 camera.position.setX(150);
 camera.position.setY(90);
@@ -75,9 +75,9 @@ class Node {
     this.geometry = new THREE.SphereGeometry(2, 24, 24);      //creates a sphere geometry
     this.material = new THREE.MeshStandardMaterial({ color: color }); //sets the sphere material
     this.node = new THREE.Mesh(this.geometry, this.material);    //creates a new 'node' onject with both the geometry and material specified
-    this.x = THREE.MathUtils.randFloatSpread(window.innerWidth);  //randomly generates a unique x,y,z value for each star
-    this.y = THREE.MathUtils.randFloatSpread(window.innerHeight);  //randomly generates a unique x,y,z value for each star
-    this.z = THREE.MathUtils.randFloatSpread(GRID_SIZE);  //randomly generates a unique x,y,z value for each star
+    this.x = THREE.MathUtils.randFloatSpread(GRID_SIZE / 2);  //randomly generates a unique x,y,z value for each star
+    this.y = THREE.MathUtils.randFloatSpread(GRID_SIZE / 2);  //randomly generates a unique x,y,z value for each star
+    this.z = THREE.MathUtils.randFloatSpread(GRID_SIZE / 2);  //randomly generates a unique x,y,z value for each star
     // console.log(this.x);
 
     this.visited = 0;   //this variable will be used in dijkstras to tell if the nod has been visited yet
@@ -444,9 +444,16 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
 
   //Loop to show the distances to every node in the graph
   console.log("\nDistance from Node " + startNodeNum + " to: ")
-  for (let i = 0; i < finalSet.length; i++) {
-    console.log("\tNode " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
-  }
+  // for (let i = 0; i < finalSet.length; i++) {
+  //   console.log("\tNode " + finalSet[i].nodeNum + ": " + finalSet[i].distance);
+  // }
+
+  var myWeightTable = document.getElementById("weightTableId");
+  finalSet.forEach(function (weightRows) {
+    var wght = myWeightTable.insertRow(-1);
+    wght.textContent = weightRows.nodeName + " : " + weightRows.distance.toFixed(2);
+    console.log("\tNode " + weightRows.nodeNum + ": " + weightRows.distance.toFixed(2));
+  });
 
 
   //Array to keep track of the nodes traversed to the endNode
@@ -463,14 +470,25 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
   }
   finalPath.push(nodeArray[startNodeNum - 1]);
 
-  //xonsole output of the path taken
+  //console output of the path taken
   console.log("\nShortest path taken from " + finalPath[finalPath.length - 1].nodeName + " to " + finalPath[0].nodeName + ": ");
   console.log("START");
-  // Reduce right calls the specified callback function for all the elements in an array, in descending order.
-  finalPath.reduceRight((_, item) => {
-    console.log("\t" + item.nodeName);
-    item.material.color.setHex(YELLOW);
-  }, null);
+
+  finalPath.reverse;  //reverse the path array so we can easily traverse in order
+
+  var myPathTable = document.getElementById("pathTableId");
+  finalPath.forEach(function (dataRows) {
+    var row = myPathTable.insertRow(-1);
+    row.textContent = dataRows.nodeName;
+    console.log("\t" + dataRows.nodeName);
+    dataRows.material.color.setHex(YELLOW);
+  });
+
+
+
+
+
+
   nodeArray[startNodeNum - 1].material.color.setHex(GREEN); //colors start node Green
   nodeArray[endNodeNum - 1].material.color.setHex(RED);   //colors end node Red
 
