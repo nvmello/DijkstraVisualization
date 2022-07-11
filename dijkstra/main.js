@@ -470,7 +470,7 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
   console.log("\nShortest path taken from " + finalPath[finalPath.length - 1].nodeName + " to " + finalPath[0].nodeName + ": ");
   console.log("START");
 
-  finalPath.reverse;  //reverse the path array so we can easily traverse in order
+  finalPath.reverse();  //reverse the path array so we can easily traverse in order
 
   /**
    * Code to print out the final path taken to the endnode
