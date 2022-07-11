@@ -8,8 +8,8 @@ import { OrbitControls } from 'OrbitControls';
  ******************************* Scene setup *********************************
  */
 
-const GRID_SIZE = 400;
-const GRID_DIVISIONS = 50;
+const GRID_SIZE = 200;
+const GRID_DIVISIONS = 25;
 
 //color hex values
 const RED = 0xff0000;
@@ -33,7 +33,7 @@ const renderer = new THREE.WebGL1Renderer({   //Actually renders the graphics to
 
 renderer.setPixelRatio(window.devicePixelRatio);    //Sets device pixel ratio.
 
-renderer.setSize(window.innerWidth / 2, window.innerHeight / 2);  //Resizes the output canvas to (width, height) with 
+renderer.setSize(window.innerWidth / 2, window.innerHeight);  //Resizes the output canvas to (width, height) with 
 //device pixel ratio taken into account
 camera.position.setX(150);
 camera.position.setY(90);
@@ -75,9 +75,9 @@ class Node {
     this.geometry = new THREE.SphereGeometry(2, 24, 24);      //creates a sphere geometry
     this.material = new THREE.MeshStandardMaterial({ color: color }); //sets the sphere material
     this.node = new THREE.Mesh(this.geometry, this.material);    //creates a new 'node' onject with both the geometry and material specified
-    this.x = THREE.MathUtils.randFloatSpread(GRID_SIZE / 2);  //randomly generates a unique x,y,z value for each star
-    this.y = THREE.MathUtils.randFloatSpread(GRID_SIZE / 2);  //randomly generates a unique x,y,z value for each star
-    this.z = THREE.MathUtils.randFloatSpread(GRID_SIZE / 2);  //randomly generates a unique x,y,z value for each star
+    this.x = THREE.MathUtils.randFloatSpread(window.innerWidth);  //randomly generates a unique x,y,z value for each star
+    this.y = THREE.MathUtils.randFloatSpread(window.innerHeight);  //randomly generates a unique x,y,z value for each star
+    this.z = THREE.MathUtils.randFloatSpread(GRID_SIZE);  //randomly generates a unique x,y,z value for each star
     // console.log(this.x);
 
     this.visited = 0;   //this variable will be used in dijkstras to tell if the nod has been visited yet
