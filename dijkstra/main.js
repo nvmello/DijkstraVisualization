@@ -494,7 +494,7 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
   console.log("END");
 }
 
-dijkstra_spt(4, 3)
+dijkstra_spt(1, 15)
 
 //***************************** Render Loop ************************************************ */
 //Animate the scene with an infitite recursive loop that continually calls render
