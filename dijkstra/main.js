@@ -23,6 +23,7 @@ const TEAL = 0x53c9b2;
 const GRAY = 0xa2a0a3;
 
 
+
 const scene = new THREE.Scene();    //Creates the container to hold all objects, cameras, lights
 // PerspectiveCamera(FOV, ASPECT RATIO, view frustrum, view frustrum)
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -496,11 +497,18 @@ function dijkstra_spt(startNodeNum, endNodeNum) {
 
 dijkstra_spt(1, 15)
 
+
+
 //***************************** Render Loop ************************************************ */
 //Animate the scene with an infitite recursive loop that continually calls render
 function animate() {
   requestAnimationFrame(animate);     //tells the browser that you want to animate something
   controls.update();                  //allows the user to control the scene with the mouse
+  camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+
+		
   renderer.render(scene, camera);     //call render on the scene and camera
 }
 
